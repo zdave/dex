@@ -6,6 +6,7 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
+use frame_system::EnsureRoot;
 use pallet_grandpa::{
     fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
@@ -58,6 +59,11 @@ pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::Account
 
 /// Balance of an account.
 pub type Balance = u128;
+
+/// Balance for assets.
+pub type AssetBalance = u64;
+
+pub type AssetId = u32;
 
 /// Index of a transaction in the chain.
 pub type Index = u32;
@@ -262,8 +268,26 @@ impl pallet_sudo::Config for Runtime {
     type Call = Call;
 }
 
+impl pallet_assets::Config for Runtime {
+    type Event = Event;
+    type Balance = AssetBalance;
+    type AssetId = AssetId;
+    type Currency = Balances;
+    type ForceOrigin = EnsureRoot<AccountId>;
+    type AssetDeposit = (); // TODO Non-zero deposits...
+    type AssetAccountDeposit = ();
+    type MetadataDepositBase = ();
+    type MetadataDepositPerByte = ();
+    type ApprovalDeposit = ();
+    type StringLimit = ConstU32<32>;
+    type Freezer = ();
+    type Extra = ();
+    type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
+}
+
 impl pallet_cfmm::Config for Runtime {
     type Event = Event;
+    type Fungibles = Assets;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -281,6 +305,7 @@ construct_runtime!(
         Balances: pallet_balances,
         TransactionPayment: pallet_transaction_payment,
         Sudo: pallet_sudo,
+        Assets: pallet_assets,
         Cfmm: pallet_cfmm,
     }
 );
