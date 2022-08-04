@@ -61,7 +61,7 @@ pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::Account
 pub type Balance = u128;
 
 /// Balance for assets.
-pub type AssetBalance = u64;
+pub type AssetBalance = u128;
 
 pub type AssetId = u32;
 

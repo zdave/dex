@@ -11,7 +11,7 @@ use sp_runtime::{
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
-type AccountId = u64;
+type AccountId = u128;
 type Balance = u32;
 type AssetBalance = u32;
 type AssetId = u32;
