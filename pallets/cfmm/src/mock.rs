@@ -1,17 +1,22 @@
 use crate as pallet_cfmm;
-use frame_support::traits::{ConstU16, ConstU32, ConstU64, StorageMapShim};
+use frame_support::{
+    parameter_types,
+    traits::{ConstU16, ConstU32, ConstU64, StorageMapShim},
+    PalletId,
+};
 use frame_system as system;
 use frame_system::EnsureRoot;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
+    Permill,
 };
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
-type AccountId = u128;
+type AccountId = u128; // Should be at least 128 bits with 32-bit AssetId to avoid get_pool_account collisions
 type Balance = u32;
 type AssetBalance = u32;
 type AssetId = u32;
@@ -91,9 +96,22 @@ impl pallet_assets::Config for Test {
     type WeightInfo = pallet_assets::weights::SubstrateWeight<Test>;
 }
 
+parameter_types!(
+    pub const CfmmPalletId: PalletId = PalletId(*b"cfmm____");
+    pub const CfmmPoolMinAmountMultiple: AssetBalance = 10;
+    pub const CfmmInitialLiquidityPerAssetUnit: AssetBalance = 10;
+    pub const CfmmExchangeFee: Permill = Permill::from_percent(10);
+);
+
 impl pallet_cfmm::Config for Test {
     type Event = Event;
+    type PalletId = CfmmPalletId;
+    type AssetId = AssetId;
+    type AssetBalance = AssetBalance;
     type Fungibles = Assets;
+    type PoolMinAmountMultiple = CfmmPoolMinAmountMultiple;
+    type InitialLiquidityPerAssetUnit = CfmmInitialLiquidityPerAssetUnit;
+    type ExchangeFee = CfmmExchangeFee;
 }
 
 // Build genesis storage according to the mock runtime.

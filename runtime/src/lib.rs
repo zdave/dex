@@ -34,7 +34,7 @@ pub use frame_support::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
         IdentityFee, Weight,
     },
-    StorageValue,
+    PalletId, StorageValue,
 };
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
@@ -285,9 +285,22 @@ impl pallet_assets::Config for Runtime {
     type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
 }
 
+parameter_types!(
+    pub const CfmmPalletId: PalletId = PalletId(*b"cfmm____");
+    pub const CfmmPoolMinAmountMultiple: AssetBalance = 1_000;
+    pub const CfmmInitialLiquidityPerAssetUnit: AssetBalance = 1_000;
+    pub const CfmmExchangeFee: Permill = Permill::from_perthousand(3);
+);
+
 impl pallet_cfmm::Config for Runtime {
     type Event = Event;
+    type PalletId = CfmmPalletId;
+    type AssetId = AssetId;
+    type AssetBalance = AssetBalance;
     type Fungibles = Assets;
+    type PoolMinAmountMultiple = CfmmPoolMinAmountMultiple;
+    type InitialLiquidityPerAssetUnit = CfmmInitialLiquidityPerAssetUnit;
+    type ExchangeFee = CfmmExchangeFee;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
